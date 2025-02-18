@@ -6,13 +6,19 @@ import {
   updatePost,
   deletePost,
 } from "../controllers/post.controller";
+import validationHandler from "../middleware/validationHandler";
+import {
+  validatePaginationAndFilters,
+  validatePost,
+  validatePostId,
+} from "../middleware/validatePost";
 
 const router = express.Router();
 
-router.post("/", createPost);
-router.get("/", getPosts);
-router.get("/:id", getPost);
-router.put("/:id", updatePost);
-router.delete("/:id", deletePost);
+router.post("/", validatePost, validationHandler, createPost);
+router.get("/", validatePaginationAndFilters, validationHandler, getPosts);
+router.get("/:id", validatePostId, validationHandler, getPost);
+router.put("/:id", validatePostId, validatePost, validationHandler, updatePost);
+router.delete("/:id", validatePostId, validationHandler, deletePost);
 
 export default router;
