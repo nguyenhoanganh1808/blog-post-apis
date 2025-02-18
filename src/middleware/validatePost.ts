@@ -21,12 +21,11 @@ export const validatePost = [
     .optional()
     .isBoolean()
     .withMessage("Published must be a boolean")
-    .escape(),
-
+    .toBoolean(),
   body("authorId")
     .isInt({ min: 1 })
     .withMessage("Author ID must be a positive integer")
-    .escape(),
+    .toInt(),
   body("tags")
     .optional()
     .isArray()

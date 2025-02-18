@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { error } from "console";
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 
@@ -58,7 +57,7 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
 
   const [posts, totalPosts] = await Promise.all([
     prisma.post.findMany({
-      where: { published: true },
+      where: filters,
       include: { author: true, tags: true, comments: true },
       skip,
       take: limit,
