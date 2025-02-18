@@ -14,10 +14,11 @@ app.use(express.urlencoded({ extended: true }));
 //   req.me
 // });
 
-app.use("/session", routes.session);
-app.use("/users", routes.user);
-app.use("/posts", routes.post);
-app.use("/api/comments", routes.comment);
+app.use("/api/v1/session", routes.session);
+app.use("/api/v1/users", routes.user);
+app.use("/api/v1/posts", routes.post);
+app.use("/api/v1/tags", routes.tag);
+app.use("/api/v1/comments", routes.comment);
 
 const PORT = process.env.PORT || 3000;
 
