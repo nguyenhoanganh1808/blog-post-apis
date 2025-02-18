@@ -116,7 +116,7 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
       published,
       authorId,
       tags: {
-        set: tagRecords.map((tag) => ({ id: tag.id })), // Remove old tags and replace with new ones
+        set: tagRecords.map((tag) => ({ id: tag.id })),
       },
     },
     include: {
