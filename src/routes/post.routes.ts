@@ -12,7 +12,12 @@ import {
   validatePost,
   validatePostId,
 } from "../middleware/validatePost";
+import {
+  validateComment,
+  validatePostIdInComments,
+} from "../middleware/validateComment";
 import { authenticateJWT } from "../middleware/authMiddleware";
+import { createComment, getComments } from "../controllers/comment.controller";
 
 const router = express.Router();
 
@@ -34,6 +39,20 @@ router.delete(
   validatePostId,
   validationHandler,
   deletePost
+);
+
+router.get(
+  "/:postId/comments",
+  validatePostIdInComments,
+  validationHandler,
+  getComments
+);
+router.post(
+  "/:postId/comments",
+  validatePostIdInComments,
+  validateComment,
+  validationHandler,
+  createComment
 );
 
 export default router;

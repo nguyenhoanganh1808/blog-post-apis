@@ -8,7 +8,7 @@ import auth from "./auth.routes";
 export default {
   session,
   user,
-  comment,
+  // comment,
   post,
   tag,
   auth,
