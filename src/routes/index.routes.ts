@@ -3,6 +3,7 @@ import user from "./user.routes";
 import post from "./post.routes";
 import comment from "./comment.routes";
 import tag from "./tag.routes";
+import auth from "./auth.routes";
 
 export default {
   session,
@@ -10,4 +11,5 @@ export default {
   comment,
   post,
   tag,
+  auth,
 };

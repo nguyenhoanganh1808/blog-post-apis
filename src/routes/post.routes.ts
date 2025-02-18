@@ -12,13 +12,28 @@ import {
   validatePost,
   validatePostId,
 } from "../middleware/validatePost";
+import { authenticateJWT } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
-router.post("/", validatePost, validationHandler, createPost);
 router.get("/", validatePaginationAndFilters, validationHandler, getPosts);
 router.get("/:id", validatePostId, validationHandler, getPost);
-router.put("/:id", validatePostId, validatePost, validationHandler, updatePost);
-router.delete("/:id", validatePostId, validationHandler, deletePost);
+
+router.post("/", authenticateJWT, validatePost, validationHandler, createPost);
+router.put(
+  "/:id",
+  authenticateJWT,
+  validatePostId,
+  validatePost,
+  validationHandler,
+  updatePost
+);
+router.delete(
+  "/:id",
+  authenticateJWT,
+  validatePostId,
+  validationHandler,
+  deletePost
+);
 
 export default router;

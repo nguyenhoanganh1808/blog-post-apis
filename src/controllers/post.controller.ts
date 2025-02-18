@@ -81,7 +81,7 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
     where: { id: Number(req.params.id) },
     include: { author: true, comments: true, tags: true },
   });
-  post ? res.json(post) : res.status(404).json({ error: "Post not found" });
+  post ? res.json(post) : res.status(404).json({ message: "Post not found" });
 });
 
 export const updatePost = asyncHandler(async (req: Request, res: Response) => {
@@ -92,7 +92,7 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
     where: { id: Number(id) },
     include: { tags: true },
   });
-  if (!existingPost) res.status(404).json({ error: "Post not found" });
+  if (!existingPost) res.status(404).json({ message: "Post not found" });
 
   let tagRecords = [];
 
