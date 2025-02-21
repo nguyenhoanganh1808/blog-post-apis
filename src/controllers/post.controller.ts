@@ -75,10 +75,14 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
   ]);
 
   res.json({
-    page,
-    limit,
-    totalPosts,
-    totalPages: Math.ceil(totalPosts / limit),
+    pagination: {
+      page,
+      limit,
+      totalPosts,
+      totalPages: Math.ceil(totalPosts / limit),
+      haveNextPage: totalPosts - page * limit > 0,
+      havePrevPage: page > 1,
+    },
     data: posts,
   });
 });

@@ -14,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/session", routes.session);
 app.use("/api/v1/auth", routes.auth);
+app.use("/api/v1/users", routes.user);
 app.use("/api/v1/posts", routes.post);
 app.use("/api/v1/tags", routes.tag);
 

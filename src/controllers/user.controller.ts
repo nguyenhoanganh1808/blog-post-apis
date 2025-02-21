@@ -12,7 +12,7 @@ export const updateUserAvatar = asyncHandler(
     }
 
     const user = await prisma.user.update({
-      where: { id: req.user?.id },
+      where: { id: req.user!.id },
       data: { avatar: `${(req.file as any).path}` }, // Save file path
     });
 

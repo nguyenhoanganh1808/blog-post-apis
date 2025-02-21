@@ -23,6 +23,8 @@ export const validatePost = [
     .withMessage("Published must be a boolean")
     .toBoolean(),
   body("authorId")
+    .notEmpty()
+    .withMessage("Author ID is required")
     .isInt({ min: 1 })
     .withMessage("Author ID must be a positive integer")
     .toInt(),
