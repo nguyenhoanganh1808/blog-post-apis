@@ -127,6 +127,23 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+export const getRecentPosts = asyncHandler(
+  async (req: Request, res: Response) => {
+    const limit = parseInt(req.query.limit as string, 10) || 5;
+    const recentPosts = await prisma.post.findMany({
+      where: { published: true },
+      include: {
+        author: { select: { id: true, name: true } },
+        tags: true,
+      },
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json({ data: recentPosts });
+  }
+);
+
 export const getPost = asyncHandler(async (req: Request, res: Response) => {
   const post = await prisma.post.findUnique({
     where: { id: Number(req.params.id) },

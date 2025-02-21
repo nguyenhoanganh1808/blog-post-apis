@@ -2,7 +2,8 @@ import express from "express";
 import {
   createPost,
   getPosts,
-  getPost,
+  // getPost,
+  getRecentPosts,
   getPostBySlug,
   updatePost,
   deletePost,
@@ -12,6 +13,7 @@ import {
   validatePaginationAndFilters,
   validatePost,
   validatePostId,
+  validateUpdatePost,
 } from "../middleware/validatePost";
 import {
   validateComment,
@@ -25,6 +27,7 @@ const router = express.Router();
 
 router.get("/", validatePaginationAndFilters, validationHandler, getPosts);
 // router.get("/:id", validatePostId, validationHandler, getPost);
+router.get("/recent", getRecentPosts);
 router.get("/:slug", getPostBySlug);
 router.get("/tags/:tagSlug", getPosts);
 
@@ -41,7 +44,7 @@ router.put(
   authenticateJWT,
   upload.single("coverPhoto"),
   validatePostId,
-  validatePost,
+  validateUpdatePost,
   validationHandler,
   updatePost
 );

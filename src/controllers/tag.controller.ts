@@ -22,7 +22,7 @@ export const createTag = asyncHandler(async (req: Request, res: Response) => {
 
 export const getTags = asyncHandler(async (_req: Request, res: Response) => {
   const tags = await prisma.tag.findMany();
-  res.json(tags);
+  res.json({ data: tags });
 });
 
 export const getTag = asyncHandler(async (req: Request, res: Response) => {

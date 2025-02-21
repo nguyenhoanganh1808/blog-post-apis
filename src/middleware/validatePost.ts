@@ -154,3 +154,97 @@ export const validateTagSlug = [
     .withMessage("Limit must be between 1 and 50")
     .toInt(),
 ];
+
+export const validateUpdatePost = [
+  body("title")
+    .optional()
+    .trim()
+    .isLength({ min: 5, max: 100 })
+    .withMessage("Title must be between 5 and 100 characters long")
+    .escape(),
+
+  body("content")
+    .optional()
+    .trim()
+    .isLength({ min: 20 })
+    .withMessage("Content must be at least 20 characters long")
+    .escape(),
+
+  body("published")
+    .optional()
+    .isBoolean()
+    .withMessage("Published must be a boolean")
+    .toBoolean(),
+
+  body("authorId")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Author ID must be a positive integer")
+    .toInt()
+    .custom(async (authorId) => {
+      const author = await prisma.user.findUnique({ where: { id: authorId } });
+      if (!author) throw new Error("Author does not exist");
+      return true;
+    }),
+
+  body("tags")
+    .optional()
+    .custom((tags) => {
+      if (typeof tags === "string") {
+        try {
+          const parsedTags = JSON.parse(tags);
+          if (
+            !Array.isArray(parsedTags) ||
+            parsedTags.some(
+              (tag) => typeof tag !== "string" || tag.trim() === ""
+            )
+          ) {
+            throw new Error();
+          }
+        } catch {
+          throw new Error("Tags must be an array of non-empty strings");
+        }
+      } else if (
+        !Array.isArray(tags) ||
+        tags.some((tag) => typeof tag !== "string" || tag.trim() === "")
+      ) {
+        throw new Error("Tags must be an array of non-empty strings");
+      }
+      return true;
+    }),
+
+  body("slug")
+    .optional()
+    .isString()
+    .withMessage("Slug must be a string")
+    .isLength({ min: 3, max: 100 })
+    .withMessage("Slug must be between 3 and 100 characters long")
+    .custom(async (slug) => {
+      const existingPost = await prisma.post.findUnique({ where: { slug } });
+      if (existingPost) {
+        throw new Error("Slug must be unique");
+      }
+      return true;
+    }),
+
+  body("coverPhoto")
+    .optional()
+    .custom((value, { req }) => {
+      if (!req.file && typeof value !== "string") {
+        throw new Error(
+          "Cover photo must be either a file upload or a valid URL"
+        );
+      }
+      return true;
+    })
+    .isString()
+    .withMessage("Cover photo must be a valid URL"),
+
+  body("excerpt")
+    .optional()
+    .isString()
+    .withMessage("Excerpt must be a string")
+    .isLength({ max: 255 })
+    .withMessage("Excerpt must be at most 255 characters long")
+    .escape(),
+];
