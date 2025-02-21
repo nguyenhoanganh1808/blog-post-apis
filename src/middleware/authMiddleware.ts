@@ -14,7 +14,7 @@ export const authenticateJWT = (
       if (err || !user) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      req.user = user;
+      req.user = user as Express.User;
       next();
     }
   )(req, res, next);

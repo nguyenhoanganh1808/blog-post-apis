@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
   const { title, content, authorId, published, tags } = req.body;
+  const coverPhoto = req.file ? (req.file as any).path : null;
 
   const tagRecords = tags
     ? await Promise.all(
@@ -25,6 +26,7 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
       content,
       published,
       authorId,
+      coverPhoto,
       tags: {
         connect: tagRecords.map((tag) => ({ id: tag.id })),
       },
@@ -58,7 +60,13 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
   const [posts, totalPosts] = await Promise.all([
     prisma.post.findMany({
       where: filters,
-      include: { author: true, tags: true, comments: true },
+      include: {
+        author: {
+          select: { id: true, name: true, email: true },
+        },
+        tags: true,
+        comments: true,
+      },
       skip,
       take: limit,
       orderBy: { createdAt: "desc" },
@@ -78,7 +86,13 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
 export const getPost = asyncHandler(async (req: Request, res: Response) => {
   const post = await prisma.post.findUnique({
     where: { id: Number(req.params.id) },
-    include: { author: true, comments: true, tags: true },
+    include: {
+      author: {
+        select: { id: true, name: true, email: true },
+      },
+      comments: true,
+      tags: true,
+    },
   });
   post ? res.json(post) : res.status(404).json({ message: "Post not found" });
 });
@@ -86,6 +100,7 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
 export const updatePost = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { title, content, published, authorId, tags } = req.body;
+  const coverPhoto = req.file ? (req.file as any).path : undefined;
 
   const existingPost = await prisma.post.findUnique({
     where: { id: Number(id) },
@@ -114,6 +129,7 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
       content,
       published,
       authorId,
+      coverPhoto,
       tags: {
         set: tagRecords.map((tag) => ({ id: tag.id })),
       },

@@ -13,6 +13,10 @@ export const validateRegister = [
     .isLength({ min: 2 })
     .withMessage("Name must be at least 2 characters long")
     .escape(),
+  body("avatar")
+    .optional()
+    .isString()
+    .withMessage("Avatar must be a valid URL"),
 ];
 
 export const validateLogin = [

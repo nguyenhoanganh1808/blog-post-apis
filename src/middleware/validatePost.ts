@@ -30,10 +30,27 @@ export const validatePost = [
     .optional()
     .isArray()
     .withMessage("Tags must be an array")
-    .custom((tags) =>
-      tags.every((tag: string) => typeof tag === "string" && tag.length > 0)
-    )
+    .custom((tags) => {
+      if (typeof tags === "string") {
+        try {
+          const parsedValue = JSON.parse(tags);
+          if (!Array.isArray(parsedValue)) {
+            throw new Error();
+          }
+        } catch (e) {
+          throw new Error("Tags must be an array");
+        }
+      } else if (!Array.isArray(tags)) {
+        throw new Error("Tags must be an array");
+      }
+      return true;
+    })
+
     .withMessage("Each tag must be a non-empty string"),
+  body("coverPhoto")
+    .optional()
+    .isString()
+    .withMessage("Cover photo must be a valid URL"),
 ];
 
 export const validatePostId = [

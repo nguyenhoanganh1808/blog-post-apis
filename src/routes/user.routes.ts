@@ -1,10 +1,15 @@
 import { Router } from "express";
-import { Request, Response } from "express";
+import { authenticateJWT } from "../middleware/authMiddleware";
+import upload from "../middleware/upload";
+import { updateUserAvatar } from "../controllers/user.controller";
 
 const router = Router();
 
-router.get("/", (req: Request, res: Response) => {
-  // return res.send(req.context.models.users[req.context.me.id]);
-});
+router.put(
+  "/avatar",
+  authenticateJWT,
+  upload.single("avatar"),
+  updateUserAvatar
+);
 
 export default router;

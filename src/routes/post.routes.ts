@@ -18,16 +18,25 @@ import {
 } from "../middleware/validateComment";
 import { authenticateJWT } from "../middleware/authMiddleware";
 import { createComment, getComments } from "../controllers/comment.controller";
+import upload from "../middleware/upload";
 
 const router = express.Router();
 
 router.get("/", validatePaginationAndFilters, validationHandler, getPosts);
 router.get("/:id", validatePostId, validationHandler, getPost);
 
-router.post("/", authenticateJWT, validatePost, validationHandler, createPost);
+router.post(
+  "/",
+  authenticateJWT,
+  upload.single("coverPhoto"),
+  validatePost,
+  validationHandler,
+  createPost
+);
 router.put(
   "/:id",
   authenticateJWT,
+  upload.single("coverPhoto"),
   validatePostId,
   validatePost,
   validationHandler,
