@@ -3,6 +3,7 @@ import {
   createPost,
   getPosts,
   getPost,
+  getPostBySlug,
   updatePost,
   deletePost,
 } from "../controllers/post.controller";
@@ -23,7 +24,8 @@ import upload from "../middleware/upload";
 const router = express.Router();
 
 router.get("/", validatePaginationAndFilters, validationHandler, getPosts);
-router.get("/:id", validatePostId, validationHandler, getPost);
+// router.get("/:id", validatePostId, validationHandler, getPost);
+router.get("/:slug", validationHandler, getPostBySlug);
 
 router.post(
   "/",

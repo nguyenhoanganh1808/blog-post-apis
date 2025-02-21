@@ -29,6 +29,7 @@ model Post {
   coverPhoto String
   title     String
   content   String?
+  slug       String   @unique
   published Boolean @default(false)
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
@@ -50,5 +51,6 @@ model Comment {
 model Tag {
   id    Int     @id @default(autoincrement())
   name  String  @unique
+  slug  String @unique
   posts Post[] 
 }

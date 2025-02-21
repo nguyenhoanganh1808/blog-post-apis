@@ -2,6 +2,13 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const generateSlug = (text) => {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-") // Replace spaces and special characters with hyphens
+    .replace(/^-+|-+$/g, ""); // Trim leading/trailing hyphens
+};
+
 async function main() {
   console.log("Seeding database...");
 
@@ -32,31 +39,31 @@ async function main() {
   const tagJS = await prisma.tag.upsert({
     where: { name: "JavaScript" },
     update: {},
-    create: { name: "JavaScript" },
+    create: { name: "JavaScript", slug: generateSlug("JavaScript") },
   });
 
   const tagNode = await prisma.tag.upsert({
     where: { name: "Node.js" },
     update: {},
-    create: { name: "Node.js" },
+    create: { name: "Node.js", slug: generateSlug("Node.js") },
   });
 
   const tagTS = await prisma.tag.upsert({
     where: { name: "TypeScript" },
     update: {},
-    create: { name: "TypeScript" },
+    create: { name: "TypeScript", slug: generateSlug("TypeScript") },
   });
 
   const tagAPI = await prisma.tag.upsert({
     where: { name: "API Development" },
     update: {},
-    create: { name: "API Development" },
+    create: { name: "API Development", slug: generateSlug("API Development") },
   });
 
   const tagDB = await prisma.tag.upsert({
     where: { name: "Databases" },
     update: {},
-    create: { name: "Databases" },
+    create: { name: "Databases", slug: generateSlug("Databases") },
   });
 
   const coverImages = [
@@ -158,9 +165,20 @@ async function main() {
 
   await Promise.all(
     postsData.map(async (post, index) => {
+      const baseSlug = generateSlug(post.title);
+      let slug = baseSlug;
+      let count = 1;
+
+      // Ensure unique slugs
+      while (await prisma.post.findUnique({ where: { slug } })) {
+        slug = `${baseSlug}-${count}`;
+        count++;
+      }
+
       await prisma.post.create({
         data: {
           title: post.title,
+          slug, // Add slug here
           content: post.content,
           published: Math.random() < 0.7, // Randomly set some posts unpublished
           authorId: post.authorId,

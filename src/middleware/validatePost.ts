@@ -1,20 +1,23 @@
+import { PrismaClient } from "@prisma/client";
 import { body, param, query } from "express-validator";
+
+const prisma = new PrismaClient();
 
 export const validatePost = [
   body("title")
     .trim()
     .notEmpty()
     .withMessage("Title is required")
-    .isLength({ min: 5 })
-    .withMessage("Title must be at least 5 characters long")
+    .isLength({ min: 5, max: 100 })
+    .withMessage("Title must be between 5 and 100 characters long")
     .escape(),
 
   body("content")
     .trim()
     .notEmpty()
     .withMessage("Content is required")
-    .isLength({ min: 10 })
-    .withMessage("Content must be at least 10 characters long")
+    .isLength({ min: 20 })
+    .withMessage("Content must be at least 20 characters long")
     .escape(),
 
   body("published")
@@ -22,37 +25,81 @@ export const validatePost = [
     .isBoolean()
     .withMessage("Published must be a boolean")
     .toBoolean(),
+
   body("authorId")
     .notEmpty()
     .withMessage("Author ID is required")
     .isInt({ min: 1 })
     .withMessage("Author ID must be a positive integer")
-    .toInt(),
+    .toInt()
+    .custom(async (authorId) => {
+      const author = await prisma.user.findUnique({ where: { id: authorId } });
+      if (!author) {
+        throw new Error("Author does not exist");
+      }
+      return true;
+    }),
+
   body("tags")
     .optional()
-    .isArray()
-    .withMessage("Tags must be an array")
     .custom((tags) => {
       if (typeof tags === "string") {
         try {
-          const parsedValue = JSON.parse(tags);
-          if (!Array.isArray(parsedValue)) {
-            throw new Error();
+          const parsedTags = JSON.parse(tags);
+          if (!Array.isArray(parsedTags)) throw new Error();
+          if (
+            parsedTags.some(
+              (tag) => typeof tag !== "string" || tag.trim() === ""
+            )
+          ) {
+            throw new Error("Each tag must be a non-empty string");
           }
-        } catch (e) {
-          throw new Error("Tags must be an array");
+        } catch {
+          throw new Error("Tags must be a valid array of non-empty strings");
         }
-      } else if (!Array.isArray(tags)) {
-        throw new Error("Tags must be an array");
+      } else if (
+        !Array.isArray(tags) ||
+        tags.some((tag) => typeof tag !== "string" || tag.trim() === "")
+      ) {
+        throw new Error("Tags must be an array of non-empty strings");
+      }
+      return true;
+    }),
+
+  body("slug")
+    .optional()
+    .isString()
+    .withMessage("Slug must be a string")
+    .isLength({ min: 3, max: 100 })
+    .withMessage("Slug must be between 3 and 100 characters long")
+    .custom(async (slug) => {
+      const existingPost = await prisma.post.findUnique({ where: { slug } });
+      if (existingPost) {
+        throw new Error("Slug must be unique");
+      }
+      return true;
+    }),
+
+  body("coverPhoto")
+    .optional()
+    .custom((value, { req }) => {
+      if (!req.file && typeof value !== "string") {
+        throw new Error(
+          "Cover photo must be either a file upload or a valid URL"
+        );
       }
       return true;
     })
-
-    .withMessage("Each tag must be a non-empty string"),
-  body("coverPhoto")
-    .optional()
     .isString()
     .withMessage("Cover photo must be a valid URL"),
+
+  body("excerpt")
+    .optional()
+    .isString()
+    .withMessage("Excerpt must be a string")
+    .isLength({ max: 255 })
+    .withMessage("Excerpt must be at most 255 characters long")
+    .escape(),
 ];
 
 export const validatePostId = [

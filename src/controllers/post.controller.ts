@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import slugify from "slugify";
 
 const prisma = new PrismaClient();
 
@@ -8,24 +9,34 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
   const { title, content, authorId, published, tags } = req.body;
   const coverPhoto = req.file ? (req.file as any).path : null;
 
+  const slug = slugify(title, { lower: true, strict: true });
+
+  let uniqueSlug = slug;
+  let counter = 1;
+  while (await prisma.post.findUnique({ where: { slug: uniqueSlug } })) {
+    uniqueSlug = `${slug}-${counter}`;
+    counter++;
+  }
+
   const tagRecords = tags
     ? await Promise.all(
         tags.map(async (tag: string) => {
+          const tagSlug = slugify(tag, { lower: true, strict: true });
           return await prisma.tag.upsert({
-            where: { name: tag },
+            where: { slug: tagSlug },
             update: {},
-            create: { name: tag },
+            create: { name: tag, slug: tagSlug },
           });
         })
       )
     : [];
-
   const post = await prisma.post.create({
     data: {
       title,
       content,
       published,
       authorId,
+      slug: uniqueSlug,
       coverPhoto,
       tags: {
         connect: tagRecords.map((tag) => ({ id: tag.id })),
@@ -37,6 +48,24 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
   });
   res.status(201).json({ message: "Post created successfully", post });
 });
+
+export const getPostBySlug = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { slug } = req.params;
+
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      include: { tags: true },
+    });
+
+    if (!post) {
+      res.status(404).json({ message: "Post not found" });
+      return;
+    }
+
+    res.json(post);
+  }
+);
 
 export const getPosts = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string, 10) || 1;
@@ -117,10 +146,11 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
   if (tags) {
     tagRecords = await Promise.all(
       tags.map(async (tag: string) => {
+        const tagSlug = slugify(tag, { lower: true, strict: true });
         return await prisma.tag.upsert({
           where: { name: tag },
           update: {},
-          create: { name: tag },
+          create: { name: tag, slug: tagSlug },
         });
       })
     );
