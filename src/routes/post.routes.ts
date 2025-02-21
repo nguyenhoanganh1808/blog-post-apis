@@ -25,7 +25,8 @@ const router = express.Router();
 
 router.get("/", validatePaginationAndFilters, validationHandler, getPosts);
 // router.get("/:id", validatePostId, validationHandler, getPost);
-router.get("/:slug", validationHandler, getPostBySlug);
+router.get("/:slug", getPostBySlug);
+router.get("/tags/:tagSlug", getPosts);
 
 router.post(
   "/",

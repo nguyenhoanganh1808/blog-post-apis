@@ -71,11 +71,15 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string, 10) || 1;
   const limit = parseInt(req.query.limit as string, 10) || 10;
   const search = req.query.search as string | undefined;
+  const tags = req.query.tags as string | undefined;
+
   const published = req.query.published
     ? req.query.published === "true"
     : undefined;
 
   const skip = (page - 1) * limit;
+
+  const tagSlugs = tags ? tags.split(",").map((t) => t.trim()) : [];
 
   const filters: any = { published };
 
@@ -84,6 +88,13 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
       { title: { contains: search, mode: "insensitive" } },
       { content: { contains: search, mode: "insensitive" } },
     ];
+  }
+  if (tagSlugs.length > 0) {
+    filters.tags = {
+      some: {
+        slug: { in: tagSlugs },
+      },
+    };
   }
 
   const [posts, totalPosts] = await Promise.all([
