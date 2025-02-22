@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { hashPassword, comparePassword } from "../utils/hashPassword";
 import dotenv from "dotenv";
+import passport from "passport";
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -33,21 +34,28 @@ export const register = async (req: Request, res: Response) => {
   });
 };
 
-export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    res.status(401).json({ message: "Invalid credentials" });
-    return;
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  interface AuthInfo {
+    message?: string;
   }
 
-  const isMatch = await comparePassword(password, user.password);
-  if (!isMatch) {
-    res.status(401).json({ message: "Invalid credentials" });
-    return;
-  }
+  passport.authenticate(
+    "local",
+    { session: false },
+    (err: Error | null, user: User | false, info: AuthInfo) => {
+      if (err) return next(err);
+      if (!user)
+        return res
+          .status(401)
+          .json({ message: info?.message || "Login failed" });
 
-  const token = generateToken(user);
-  res.json({ message: "Login successful", token });
+      const token = generateToken(user);
+      const { password, ...rest } = user;
+      res.json({ message: "Login successful", token, rest });
+    }
+  )(req, res, next);
 };

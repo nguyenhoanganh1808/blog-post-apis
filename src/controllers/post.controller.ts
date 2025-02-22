@@ -55,7 +55,10 @@ export const getPostBySlug = asyncHandler(
 
     const post = await prisma.post.findUnique({
       where: { slug },
-      include: { tags: true },
+      include: {
+        tags: true,
+        author: { select: { id: true, name: true, email: true } },
+      },
     });
 
     if (!post) {

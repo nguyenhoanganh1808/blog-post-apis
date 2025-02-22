@@ -11,6 +11,7 @@ export const authenticateJWT = (
     "jwt",
     { session: false },
     (err: Error | null, user: User | false) => {
+      console.log("user: ", user);
       if (err || !user) {
         return res.status(401).json({ message: "Unauthorized" });
       }

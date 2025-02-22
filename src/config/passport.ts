@@ -14,11 +14,12 @@ passport.use(
     async (email, password, done) => {
       try {
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return done(null, false, { message: "User not found" });
+        if (!user)
+          return done(null, false, { message: "Invalid email or password" });
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch)
-          return done(null, false, { message: "Incorrect password" });
+          return done(null, false, { message: "Invalid email or password" });
 
         return done(null, user);
       } catch (error) {
