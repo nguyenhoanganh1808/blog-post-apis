@@ -58,6 +58,7 @@ export const getPostBySlug = asyncHandler(
       include: {
         tags: true,
         author: { select: { id: true, name: true, email: true } },
+        comments: true,
       },
     });
 

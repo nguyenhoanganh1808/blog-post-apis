@@ -4,6 +4,6 @@ import { createComment, getComments } from "../controllers/comment.controller";
 const router = express.Router();
 
 router.post("/", createComment);
-router.get("/:postId", getComments);
+router.get("/:postSlug", getComments);
 
 export default router;

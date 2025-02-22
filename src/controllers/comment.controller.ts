@@ -35,9 +35,9 @@ export const getComments = async (req: Request, res: Response) => {
   res.json({
     data: comments,
     pagination: {
-      totalComments,
+      totalItems: totalComments,
       totalPages: Math.ceil(totalComments / limit),
-      page,
+      currentPage: page,
       limit,
     },
   });
