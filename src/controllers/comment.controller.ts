@@ -37,7 +37,7 @@ export const getComments = async (req: Request, res: Response) => {
     pagination: {
       totalItems: totalComments,
       totalPages: Math.ceil(totalComments / limit),
-      currentPage: page,
+      page: page,
       limit,
     },
   });

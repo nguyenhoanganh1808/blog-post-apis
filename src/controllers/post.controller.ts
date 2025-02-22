@@ -122,7 +122,7 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
     pagination: {
       page,
       limit,
-      totalPosts,
+      totalItems: totalPosts,
       totalPages: Math.ceil(totalPosts / limit),
       haveNextPage: totalPosts - page * limit > 0,
       havePrevPage: page > 1,

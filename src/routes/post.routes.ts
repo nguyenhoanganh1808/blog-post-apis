@@ -7,6 +7,7 @@ import {
   getPostBySlug,
   updatePost,
   deletePost,
+  getPost,
 } from "../controllers/post.controller";
 import validationHandler from "../middleware/validationHandler";
 import {
@@ -26,10 +27,11 @@ import upload from "../middleware/upload";
 const router = express.Router();
 
 router.get("/", validatePaginationAndFilters, validationHandler, getPosts);
-// router.get("/:id", validatePostId, validationHandler, getPost);
 router.get("/recent", getRecentPosts);
-router.get("/:slug", getPostBySlug);
 router.get("/tags/:tagSlug", getPosts);
+
+router.get("/:id", validatePostId, validationHandler, getPost);
+router.get("/slug/:slug", getPostBySlug);
 
 router.post(
   "/",
