@@ -123,9 +123,7 @@ export const validatePaginationAndFilters = [
   query("search")
     .optional()
     .isString()
-    .withMessage("Search query must be a string")
-    .isLength({ min: 3 })
-    .withMessage("Search query must be at least 3 characters long"),
+    .withMessage("Search query must be a string"),
 
   query("published")
     .optional()
