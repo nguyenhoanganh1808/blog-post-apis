@@ -6,8 +6,7 @@ import slugify from "slugify";
 const prisma = new PrismaClient();
 
 export const createPost = asyncHandler(async (req: Request, res: Response) => {
-  const { title, content, authorId, published, tags } = req.body;
-  const coverPhoto = req.file ? (req.file as any).path : null;
+  const { title, content, published, tags, coverPhoto } = req.body;
 
   const slug = slugify(title, { lower: true, strict: true });
 
@@ -35,7 +34,7 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
       title,
       content,
       published,
-      authorId,
+      authorId: req.user!.id,
       slug: uniqueSlug,
       coverPhoto,
       tags: {
@@ -68,6 +67,25 @@ export const getPostBySlug = asyncHandler(
     }
 
     res.json(post);
+  }
+);
+export const togglePublish = asyncHandler(
+  async (req: Request, res: Response) => {
+    const post = await prisma.post.findUnique({
+      where: { id: Number(req.params.id) },
+    });
+
+    if (!post) {
+      res.status(404).json({ message: "Post not found" });
+      return;
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: { id: post.id },
+      data: { published: !post.published },
+    });
+
+    res.json({ message: "Post status updated", post: updatedPost });
   }
 );
 
@@ -110,6 +128,7 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
         },
         tags: true,
         comments: true,
+        _count: { select: { comments: true } },
       },
       skip,
       take: limit,

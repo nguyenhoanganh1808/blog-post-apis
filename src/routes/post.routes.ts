@@ -8,6 +8,7 @@ import {
   updatePost,
   deletePost,
   getPost,
+  togglePublish,
 } from "../controllers/post.controller";
 import validationHandler from "../middleware/validationHandler";
 import {
@@ -33,14 +34,7 @@ router.get("/tags/:tagSlug", getPosts);
 router.get("/:id", validatePostId, validationHandler, getPost);
 router.get("/slug/:slug", getPostBySlug);
 
-router.post(
-  "/",
-  authenticateJWT,
-  upload.single("coverPhoto"),
-  validatePost,
-  validationHandler,
-  createPost
-);
+router.post("/", authenticateJWT, validatePost, validationHandler, createPost);
 router.put(
   "/:id",
   authenticateJWT,
@@ -50,6 +44,14 @@ router.put(
   validationHandler,
   updatePost
 );
+router.patch(
+  "/:id/publish",
+  authenticateJWT,
+  validatePostId,
+  validationHandler,
+  togglePublish
+);
+
 router.delete(
   "/:id",
   authenticateJWT,

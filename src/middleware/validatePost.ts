@@ -17,8 +17,7 @@ export const validatePost = [
     .notEmpty()
     .withMessage("Content is required")
     .isLength({ min: 20 })
-    .withMessage("Content must be at least 20 characters long")
-    .escape(),
+    .withMessage("Content must be at least 20 characters long"),
 
   body("published")
     .optional()
@@ -27,8 +26,7 @@ export const validatePost = [
     .toBoolean(),
 
   body("authorId")
-    .notEmpty()
-    .withMessage("Author ID is required")
+    .optional()
     .isInt({ min: 1 })
     .withMessage("Author ID must be a positive integer")
     .toInt()
@@ -165,9 +163,7 @@ export const validateUpdatePost = [
     .optional()
     .trim()
     .isLength({ min: 20 })
-    .withMessage("Content must be at least 20 characters long")
-    .escape(),
-
+    .withMessage("Content must be at least 20 characters long"),
   body("published")
     .optional()
     .isBoolean()
