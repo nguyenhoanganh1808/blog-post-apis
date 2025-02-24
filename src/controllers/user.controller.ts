@@ -19,3 +19,14 @@ export const updateUserAvatar = asyncHandler(
     res.json({ message: "Avatar updated successfully", user });
   }
 );
+
+export const updateUser = asyncHandler(async (req: Request, res: Response) => {
+  const { avatar, name, email } = req.body;
+
+  const user = await prisma.user.update({
+    where: { id: req.user!.id },
+    data: { avatar, name, email },
+  });
+
+  res.json({ message: "User updated successfully", user });
+});

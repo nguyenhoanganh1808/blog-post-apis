@@ -24,3 +24,9 @@ export const validateLogin = [
 
   body("password").notEmpty().withMessage("Password is required").escape(),
 ];
+
+export const validateUpdateUser = [
+  body("name").trim().notEmpty().withMessage("Name is required"),
+  body("email").isEmail().withMessage("Invalid email format"),
+  body("avatar").optional().isURL().withMessage("Avatar must be a valid URL"),
+];

@@ -22,7 +22,10 @@ import {
   validatePostIdInComments,
 } from "../middleware/validateComment";
 import { authenticateJWT } from "../middleware/authMiddleware";
-import { createComment, getComments } from "../controllers/comment.controller";
+import {
+  createComment,
+  getCommentsByPost,
+} from "../controllers/comment.controller";
 import upload from "../middleware/upload";
 
 const router = express.Router();
@@ -64,8 +67,9 @@ router.get(
   "/:postId/comments",
   validatePostIdInComments,
   validationHandler,
-  getComments
+  getCommentsByPost
 );
+
 router.post(
   "/:postId/comments",
   validatePostIdInComments,

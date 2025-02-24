@@ -18,6 +18,7 @@ app.use("/api/v1/users", routes.user);
 app.use("/api/v1/posts", routes.post);
 app.use("/api/v1/tags", routes.tag);
 app.use("/api/v1", routes.image);
+app.use("/api/v1/comments", routes.comment);
 
 const PORT = process.env.PORT || 3000;
 
