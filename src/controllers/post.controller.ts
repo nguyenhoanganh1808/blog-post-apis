@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import slugify from "slugify";
+import redis from "../config/redis";
 
 const prisma = new PrismaClient();
 
@@ -45,6 +46,9 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
       tags: true,
     },
   });
+
+  await redis.del("all_posts");
+
   res.status(201).json({ message: "Post created successfully", post });
 });
 
@@ -90,6 +94,14 @@ export const togglePublish = asyncHandler(
 );
 
 export const getPosts = asyncHandler(async (req: Request, res: Response) => {
+  const cacheKey = "all_posts";
+
+  const cachedPosts = await redis.get(cacheKey);
+  if (cachedPosts) {
+    res.json(JSON.parse(cachedPosts));
+    return;
+  }
+
   const page = parseInt(req.query.page as string, 10) || 1;
   const limit = parseInt(req.query.limit as string, 10) || 10;
   const search = req.query.search as string | undefined;
@@ -137,7 +149,7 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
     prisma.post.count({ where: filters }),
   ]);
 
-  res.json({
+  const responseData = {
     pagination: {
       page,
       limit,
@@ -147,7 +159,11 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
       havePrevPage: page > 1,
     },
     data: posts,
-  });
+  };
+
+  await redis.setex(cacheKey, 60, JSON.stringify(responseData));
+
+  res.json(responseData);
 });
 
 export const getRecentPosts = asyncHandler(
@@ -223,6 +239,9 @@ export const updatePost = asyncHandler(async (req: Request, res: Response) => {
       tags: true,
     },
   });
+
+  await redis.del("all_posts");
+
   res.json(post);
 });
 
