@@ -8,10 +8,10 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 0978042899
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: blog_db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U prisma -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d blog_db"]
       interval: 5s
       timeout: 2s
       retries: 20
