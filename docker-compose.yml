@@ -1,35 +1,54 @@
 version: "3.8"
 
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - redis
-
-  db:
+  postgres_db:
     image: postgres
+    hostname: postgres_db
+    container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    env_file:
-      - .env
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 0978042899
+      POSTGRES_DB: blog_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prisma -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    command: postgres -c listen_addresses='*'
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   redis:
     image: redis:alpine
     restart: always
     ports:
       - "6379:6379"
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+networks:
+  prisma-network:
+    name: blog-server-network
 
 volumes:
   pgdata:
