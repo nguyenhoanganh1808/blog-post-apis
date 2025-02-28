@@ -156,9 +156,7 @@ export const validateUpdatePost = [
     .optional()
     .trim()
     .isLength({ min: 5, max: 100 })
-    .withMessage("Title must be between 5 and 100 characters long")
-    .escape(),
-
+    .withMessage("Title must be between 5 and 100 characters long"),
   body("content")
     .optional()
     .trim()
