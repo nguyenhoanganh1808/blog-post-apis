@@ -18,7 +18,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     command: postgres -c listen_addresses='*'
     logging:
       options:
@@ -53,4 +53,4 @@ networks:
     name: blog-server-network
 
 volumes:
-  pgdata:
+  postgres_data:
