@@ -96,12 +96,6 @@ export const togglePublish = asyncHandler(
 export const getPosts = asyncHandler(async (req: Request, res: Response) => {
   const cacheKey = "all_posts";
 
-  const cachedPosts = await redis.get(cacheKey);
-  if (cachedPosts) {
-    res.json(JSON.parse(cachedPosts));
-    return;
-  }
-
   const page = parseInt(req.query.page as string, 10) || 1;
   const limit = parseInt(req.query.limit as string, 10) || 10;
   const search = req.query.search as string | undefined;
@@ -111,6 +105,11 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
     ? req.query.published === "true"
     : undefined;
 
+  const cachedPosts = await redis.get(cacheKey);
+  if (cachedPosts && !search && !tags && published === undefined) {
+    res.json(JSON.parse(cachedPosts));
+    return;
+  }
   const skip = (page - 1) * limit;
 
   const tagSlugs = tags ? tags.split(",").map((t) => t.trim()) : [];
