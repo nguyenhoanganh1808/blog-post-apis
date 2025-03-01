@@ -16,7 +16,7 @@ services:
       timeout: 2s
       retries: 20
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command: postgres -c listen_addresses='*'
@@ -49,8 +49,9 @@ services:
         condition: service_started
 
 networks:
-  prisma-network:
+  blog-network:
     name: blog-server-network
+    driver: bridge
 
 volumes:
   postgres_data:

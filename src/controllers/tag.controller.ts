@@ -20,8 +20,26 @@ export const createTag = asyncHandler(async (req: Request, res: Response) => {
   res.status(201).json(tag);
 });
 
-export const getTags = asyncHandler(async (_req: Request, res: Response) => {
-  const tags = await prisma.tag.findMany();
+export const getTags = asyncHandler(async (req: Request, res: Response) => {
+  const search = req.query.search as string | undefined;
+
+  const filters: any = {};
+
+  if (search) {
+    filters.OR = [{ name: { contains: search, mode: "insensitive" } }];
+  }
+
+  const tags = await prisma.tag.findMany({
+    where: filters,
+
+    include: {
+      _count: {
+        select: {
+          posts: true,
+        },
+      },
+    },
+  });
   res.json({ data: tags });
 });
 
