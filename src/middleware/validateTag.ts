@@ -6,7 +6,8 @@ export const validateTag = [
     .notEmpty()
     .withMessage("Tag name is required")
     .isLength({ min: 3 })
-    .withMessage("Tag name must be at least 3 characters long"),
+    .withMessage("Tag name must be at least 3 characters long")
+    .escape(),
 ];
 
 export const validateTagId = [

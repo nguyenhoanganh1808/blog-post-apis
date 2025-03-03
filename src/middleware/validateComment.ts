@@ -21,7 +21,6 @@ export const validateUpdateComment = [
   body("text")
     .optional()
     .trim()
-
     .isLength({ min: 5 })
     .withMessage("Text must be at least 5 characters long")
     .escape(),
