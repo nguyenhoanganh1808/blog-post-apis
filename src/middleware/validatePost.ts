@@ -10,7 +10,7 @@ export const validatePost = [
     .withMessage("Title is required")
     .isLength({ min: 5, max: 100 })
     .withMessage("Title must be between 5 and 100 characters long")
-    .escape(),
+    .blacklist("<>"),
 
   body("content")
     .trim()
@@ -103,8 +103,7 @@ export const validatePost = [
 export const validatePostId = [
   param("id")
     .isInt({ min: 1 })
-    .withMessage("Post ID must be a positive integer")
-    .escape(),
+    .withMessage("Post ID must be a positive integer"),
 ];
 
 export const validatePaginationAndFilters = [
@@ -156,7 +155,8 @@ export const validateUpdatePost = [
     .optional()
     .trim()
     .isLength({ min: 5, max: 100 })
-    .withMessage("Title must be between 5 and 100 characters long"),
+    .withMessage("Title must be between 5 and 100 characters long")
+    .blacklist("<>"),
   body("content")
     .optional()
     .trim()

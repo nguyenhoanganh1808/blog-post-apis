@@ -7,14 +7,14 @@ export const validateComment = [
     .withMessage("Text is required")
     .isLength({ min: 5 })
     .withMessage("Text must be at least 5 characters long")
-    .escape(),
+    .blacklist("<>"),
   body("username")
     .trim()
     .notEmpty()
     .withMessage("Username is required")
     .isLength({ min: 3 })
     .withMessage("Username must be at least 3 characters long")
-    .escape(),
+    .blacklist("<>"),
 ];
 
 export const validateUpdateComment = [
@@ -23,25 +23,23 @@ export const validateUpdateComment = [
     .trim()
     .isLength({ min: 5 })
     .withMessage("Text must be at least 5 characters long")
-    .escape(),
+    .blacklist("<>"),
   body("username")
     .optional()
     .trim()
     .isLength({ min: 3 })
     .withMessage("Username must be at least 3 characters long")
-    .escape(),
+    .blacklist("<>"),
 ];
 
 export const validatePostIdInComments = [
   param("postId")
     .isInt({ min: 1 })
-    .withMessage("Post ID must be a positive integer")
-    .escape(),
+    .withMessage("Post ID must be a positive integer"),
 ];
 
 export const validateCommentId = [
   param("id")
     .isInt({ min: 1 })
-    .withMessage("Comment ID must be a positive integer")
-    .escape(),
+    .withMessage("Comment ID must be a positive integer"),
 ];
