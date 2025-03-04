@@ -133,3 +133,8 @@ docker run -p 3000:3000 --env-file .env blog-api
 ```sh
 docker compose up --build -d
 ```
+
+## 🔗 Related Projects
+
+- **Blog Frontend**: [GitHub Repository](https://github.com/nguyenhoanganh1808/my-blog-frontend)
+- **Blog Admin Panel**: [GitHub Repository](https://github.com/nguyenhoanganh1808/my-blog-admin)
