@@ -94,8 +94,6 @@ export const togglePublish = asyncHandler(
 );
 
 export const getPosts = asyncHandler(async (req: Request, res: Response) => {
-  const cacheKey = "all_posts";
-
   const page = parseInt(req.query.page as string, 10) || 1;
   const limit = parseInt(req.query.limit as string, 10) || 10;
   const search = req.query.search as string | undefined;
@@ -104,9 +102,12 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
   const published = req.query.published
     ? req.query.published === "true"
     : undefined;
+  const cacheKey = `posts:${page}:${limit}:${search || ""}:${tags || ""}:${
+    published ?? "all"
+  }`;
 
   const cachedPosts = await redis.get(cacheKey);
-  if (cachedPosts && !search && !tags && published === undefined) {
+  if (cachedPosts) {
     res.json(JSON.parse(cachedPosts));
     return;
   }
@@ -138,7 +139,6 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
           select: { id: true, name: true, email: true },
         },
         tags: true,
-        comments: true,
         _count: { select: { comments: true } },
       },
       skip,
@@ -160,7 +160,9 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
     data: posts,
   };
 
-  await redis.setex(cacheKey, 60, JSON.stringify(responseData));
+  if (!search && !tags && published === undefined) {
+    await redis.setex(cacheKey, 60, JSON.stringify(responseData));
+  }
 
   res.json(responseData);
 });
