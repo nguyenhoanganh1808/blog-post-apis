@@ -24,6 +24,8 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - blog-network
 
   redis:
     container_name: blog-redis
@@ -31,6 +33,9 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - blog-network
+
   server:
     container_name: blog-server
     build:
@@ -47,6 +52,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    networks:
+      - blog-network
 
   prisma-studio:
     image: node:lts-alpine3.17
