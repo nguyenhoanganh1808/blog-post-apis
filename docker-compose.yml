@@ -59,7 +59,7 @@ services:
     env_file:
       - .env
     networks:
-      - prisma-network
+      - blog-server-network
     depends_on:
       postgres_db:
         condition: service_healthy
